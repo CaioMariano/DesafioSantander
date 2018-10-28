@@ -29,27 +29,92 @@ class ViewController: UIViewController {
     
     @IBAction func ButtonLogin(_ sender: UIButton) {
         
-        let login = self.textFieldUser.text
-        let senha = self.textFieldPassword.text
-        let verificacao = try? NSRegularExpression(pattern: "(?=.[A-Z])(?=.[!@#$&])(?=.[0-9]).{6}$", options: .caseInsensitive)
-        
-        
         // Validacao do User e Password
-        guard let login = self.textFieldUser.text, let senha = self.textFieldPassword.text else {
+       
+        let user = self.textFieldUser.text
+        let password = self.textFieldPassword.text
+        
+        
+        //MARK: validacao Password
+        
+        if password != nil {
             
-            // Alerta
-            let alerta = UIAlertController(title: "Alerta", message: "Usuario ou senha invalidos", preferredStyle: .alert)
+            // parametros da senha
+            // 1 letras maiusculas
+            // 1 caracter especial
+            // 1 numeros na senha
+            // 8 numeros, nem mais nem menos
             
-            let botaoOk = UIAlertAction(title: "Ok", style: .default, handler: nil)
             
-            alerta.addAction(botaoOk)
+            func isPasswordValid(_ password : String) -> Bool{
+                let passwordTest = NSPredicate(format: "SELF MATCHES %@", "^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]).{8}$")
+                return passwordTest.evaluate(with: password)
+            }
             
-            present(alerta, animated: true, completion: nil)
-            // Final alerta
+            if isPasswordValid(password!) == true {
+                
+                print("Senha Correta")
+                
+            } else {
+                
+                // Alerta
+                let alerta = UIAlertController(title: "Alerta", message: "senha invalida", preferredStyle: .alert)
+                
+                let botaoOk = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                
+                alerta.addAction(botaoOk)
+                
+                present(alerta, animated: true, completion: nil)
+                // Final alerta
+                
+                print("Login ou senha nulos")
+                return
+                
             
-            print("Login ou senha nulos")
-            return
-        }
+            }
+        }// Fechamento validacao Password
+        
+        //MARK: validacao User
+        
+        if user != nil {
+            
+            // Validacao e-mail
+            func isValidEmail(testStr:String) -> Bool {
+                let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+                
+                let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+                return emailTest.evaluate(with: testStr)
+                
+            }
+            
+            // Validacao Cpf
+            func validateCpf(value: String) -> Bool {
+                let cpfRegex = "^\\d{3}.\\d{3}.\\d{3}-\\d{2}$"
+                let cpfTest = NSPredicate(format: "SELF MATCHES %@", cpfRegex)
+                let result =  cpfTest.evaluate(with: value)
+                return result
+            }
+            
+            
+            if isValidEmail(testStr: user!) == true || validateCpf(value: user!) == true  {
+                
+                print("Login Correto")
+                
+            }else {
+                print("Login nulo ")
+                let alerta = UIAlertController(title: "Alerta", message: "Usuário/ Senha Inválidos. Preencha novamente.", preferredStyle: .alert)
+                
+                let acaoOk = UIAlertAction(title: "OK", style: .default, handler: nil)
+                
+                alerta.addAction(acaoOk)
+                
+                self.present(alerta, animated: true, completion: nil)
+                
+                return
+            }
+            
+            
+        }// Fechamento validacao User
         
         // urlLogin
         guard let urlLogin = URL(string: "https://bank-app-test.herokuapp.com/api/login") else {
@@ -62,7 +127,7 @@ class ViewController: UIViewController {
         var requestBoladona  = URLRequest(url: urlLogin)
         requestBoladona.httpMethod = "POST"
         requestBoladona.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        requestBoladona.httpBody = "user=\(login)&password=\(senha)".data(using: .utf8)
+        requestBoladona.httpBody = "user=\(user)&password=\(password)".data(using: .utf8)
         
         let session = URLSession(configuration: .default)
         
@@ -84,9 +149,9 @@ class ViewController: UIViewController {
                 return
             }
             
-            print("Awe caraca peguei o retorno: é o baguho é este aqui:\n \(resultado)")
+            print("Primeiro Retorno:\n \(resultado)")
             
-            // Aqui vc toma decisão do que vai fazer com o resultado
+            // tomar decisão do que vai fazer com o resultado
             
             }.resume()
         
@@ -94,13 +159,6 @@ class ViewController: UIViewController {
     
     //MARK: Funcoes
     
-    // funcao de validacao de email
-    func isValidEmail(testStr:String) -> Bool {
-        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        
-        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        return emailTest.evaluate(with: testStr)
-    }
 }
 
 
