@@ -22,6 +22,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+     
         
     }
     
@@ -124,14 +125,14 @@ class ViewController: UIViewController {
         
         //MARK: Primeira request
         
-        var requestBoladona  = URLRequest(url: urlLogin)
-        requestBoladona.httpMethod = "POST"
-        requestBoladona.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        requestBoladona.httpBody = "user=\(user)&password=\(password)".data(using: .utf8)
+        var primeiraRequest  = URLRequest(url: urlLogin)
+        primeiraRequest.httpMethod = "POST"
+        primeiraRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        primeiraRequest.httpBody = "user=\(user)&password=\(password)".data(using: .utf8)
         
         let session = URLSession(configuration: .default)
         
-        session.dataTask(with: requestBoladona) { (data, response, error) in
+        session.dataTask(with: primeiraRequest) { (data, response, error) in
             
             if let error = error {
                 print("Error: \(error)")
@@ -153,12 +154,51 @@ class ViewController: UIViewController {
             
             // tomar decisão do que vai fazer com o resultado
             
+            if let userAccount = resultado!["userAccount"], let userAccountObjeto = userAccount as? [String : AnyObject],
+                let name = userAccountObjeto ["name"] ,
+                let agency = userAccountObjeto ["agency"],
+                let balance = userAccountObjeto ["balance"],
+                let bankAccount = userAccountObjeto ["bankAccount"],
+                let userId = userAccountObjeto ["userId"]{
+                
+                print("Name Boladão: \(agency)")
+                
+                 func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+                    
+                    if (segue.identifier == "irTelaCliente"){
+                        print("Entro no IF")
+                        guard let viewController2 = segue.destination as? Tela2ViewController else {return}
+                    
+                     viewController2.nome = "\(name)"
+                     viewController2.conta = "\(bankAccount) / \(agency)"
+                     viewController2.saldo = "R$\(balance)"
+                        
+                        print("Passou aqui")
+                        print("print felipe \(viewController2.nome)")
+
+                    }
+                    
+                }
+            
+            }
+            
             }.resume()
         
     }
     
-    //MARK: Funcoes
     
+    
+    
+    
+    // MARK: - Metodo UIResponder
+    
+    override var canBecomeFirstResponder: Bool{
+        return true
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.becomeFirstResponder()
+    }
 }
 
 

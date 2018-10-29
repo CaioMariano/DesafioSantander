@@ -10,6 +10,17 @@ import UIKit
 
 class CelulaTableViewCell: UITableViewCell {
 
+    //MARK: -Outlets
+    
+    @IBOutlet weak var labelTitulo: UILabel!
+    
+    @IBOutlet weak var labelDescricao: UILabel!
+    
+    @IBOutlet weak var labelData: UILabel!
+    
+    @IBOutlet weak var labelPagamento: UILabel!
+    
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
