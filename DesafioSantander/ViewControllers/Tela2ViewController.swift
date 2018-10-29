@@ -31,16 +31,19 @@ class Tela2ViewController: UIViewController {
         
         // Do any additional setup after loading the view.
     
-        self.labelSaldo.text = self.saldo
-        self.labelNome.text = self.nome
-        self.labelConta.text = self.conta
+         requestDaTela2()
         
-        requestDaTela2()
+        self.labelSaldo.text = saldo
+        self.labelNome.text = nome
+        self.labelConta.text = conta
+        
+       
     }
     
     //MARK: Actions
     
     @IBAction func ButtonVoltar(_ sender: UIButton) {
+        
     }
     
     //MARK: Funcoes
@@ -63,44 +66,38 @@ class Tela2ViewController: UIViewController {
     session2.dataTask(with: segundaRequest) { (data, response, error) in
     
     if let error = error {
-    print("iXi maluco deu este erro aqui: \(error)")
+    print("Error\(error)")
     return
     }
     
     guard let data = data else {
-    print("iXi mano, a data veio nula")
+    print("Data nula")
     return
     }
     
     guard let resultado = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String:AnyObject]  else {
     
-    print("iXi mermão! Não consegui converter o resultado em um NSDictionary")
+    print("Erro ao converter o resultado em um NSDictionary")
     return
     }
     
     print("retorno da segunda request:\n \(resultado)")
     
-    // Aqui vc toma decisão do que vai fazer com o resultado
     
-        if let statementList = resultado!["statementList"], let statementListObjeto = statementList as? Dictionary<String, AnyObject>,
-            let date = statementListObjeto ["date"] ,
-            let desc = statementListObjeto ["desc"],
-            let title = statementListObjeto ["title"],
-            let value = statementListObjeto ["value"]{
-            
-            print("Name Boladão22: \(title)")
-        
-        }
+    
+//        if let statementList = resultado!["statementList"], let statementListObjeto = statementList as? Dictionary<String, AnyObject>,
+//            let date = statementListObjeto ["date"] ,
+//            let desc = statementListObjeto ["desc"],
+//            let title = statementListObjeto ["title"],
+//            let value = statementListObjeto ["value"]{
+//
+//            print("Title: \(title)")
+//
+//        }
     }.resume()
     
     }
 }
-//if let dict = result.value as? Dictionary<String, AnyObject> {
-//    if let items = dict["items"] as? [Dictionary<String, AnyObject>]{
-//        for item in items {
-//            repos.append(Repository(respositorioDicionario: item))
-//        }
-//    }
-//}
+
 
 

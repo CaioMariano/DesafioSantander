@@ -9,7 +9,7 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     //MARK: Outlets
     
     @IBOutlet weak var textFieldUser: UITextField!
@@ -19,10 +19,11 @@ class ViewController: UIViewController {
     
     //MARK: Propriedades
     
+    private var userAccount : UserAccount?
+    
+    //MARK: LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-     
         
     }
     
@@ -31,7 +32,7 @@ class ViewController: UIViewController {
     @IBAction func ButtonLogin(_ sender: UIButton) {
         
         // Validacao do User e Password
-       
+        
         let user = self.textFieldUser.text
         let password = self.textFieldPassword.text
         
@@ -71,7 +72,7 @@ class ViewController: UIViewController {
                 print("Login ou senha nulos")
                 return
                 
-            
+                
             }
         }// Fechamento validacao Password
         
@@ -117,6 +118,9 @@ class ViewController: UIViewController {
             
         }// Fechamento validacao User
         
+        
+        
+        
         // urlLogin
         guard let urlLogin = URL(string: "https://bank-app-test.herokuapp.com/api/login") else {
             print("Não foi possível inicializar a URL a partir da string")
@@ -152,7 +156,7 @@ class ViewController: UIViewController {
             
             print("Primeiro Retorno:\n \(resultado)")
             
-            // tomar decisão do que vai fazer com o resultado
+            // Extraindo os dados de User Account
             
             if let userAccount = resultado!["userAccount"], let userAccountObjeto = userAccount as? [String : AnyObject],
                 let name = userAccountObjeto ["name"] ,
@@ -161,34 +165,27 @@ class ViewController: UIViewController {
                 let bankAccount = userAccountObjeto ["bankAccount"],
                 let userId = userAccountObjeto ["userId"]{
                 
-                print("Name Boladão: \(agency)")
+                print("Name: \(name)")
+                print("agency: \(agency)")
+                print("balance: \(balance)")
+                print("bankAccount: \(bankAccount)")
+                print("userId: \(userId)")
                 
-                 func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-                    
-                    if (segue.identifier == "irTelaCliente"){
-                        print("Entro no IF")
-                        guard let viewController2 = segue.destination as? Tela2ViewController else {return}
-                    
-                     viewController2.nome = "\(name)"
-                     viewController2.conta = "\(bankAccount) / \(agency)"
-                     viewController2.saldo = "R$\(balance)"
-                        
-                        print("Passou aqui")
-                        print("print felipe \(viewController2.nome)")
-
-                    }
-                    
+                // Conversões
+                guard let nameString = name as? String, let agencyString = agency as? String, let bankAccountString = bankAccount as? String, let userIDInt = userId as? Int, let balanceDouble = balance as? Double else {
+                    print("Erro na conversão")
+                    return
                 }
-            
+                
+                self.userAccount = UserAccount(userId: userIDInt, name: nameString, bankAccount: bankAccountString, agency: agencyString, balance: balanceDouble)
+                
+                //DispatchQueue
+                DispatchQueue.main.async {
+                    self.performSegue(withIdentifier: "irTela2", sender: nil)
+                }
             }
-            
             }.resume()
-        
     }
-    
-    
-    
-    
     
     // MARK: - Metodo UIResponder
     
@@ -199,6 +196,33 @@ class ViewController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.becomeFirstResponder()
     }
+    
+    //MARK: Prepare Segue
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        print("Acima if")
+        if (segue.identifier == "irTela2"){
+            
+            print("Entrou")
+            
+            guard let viewController2 = segue.destination as? Tela2ViewController else {return}
+            
+            guard let userAccount = self.userAccount else {
+                print("User Account inválido")
+                return
+            }
+            
+            viewController2.nome = "\(userAccount.name)"
+            viewController2.conta = "\(userAccount.bankAccount) / \(userAccount.agency)"
+            viewController2.saldo = "R$\(userAccount.balance)"
+            
+            print("Passou aqui")
+            print(" \(viewController2.nome)")
+            
+        }
+    }// Fechamento Prepare segue
+    
 }
 
 
